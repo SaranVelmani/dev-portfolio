@@ -192,7 +192,7 @@ window.PORTFOLIO = {
     title: "Full Stack Developer",
     company: "Opalminds IT Solutions",
     place: "Trichy",
-    period: "Aug 2024 – Present",
+    period: "Oct 2024 – Present",
     points: [
       "Multi-agent LLM pipelines with LangGraph/LangChain for document intelligence, classification and compliance-style decisioning",
       "RAG retrieval for domain Q&A with streaming responses",
@@ -207,7 +207,7 @@ window.PORTFOLIO = {
     { when: "2018 – 2020", what: "Higher Secondary, Computer Science", where: "Nadar Hr. Sec. School, Kovilpatti" },
     { when: "2020 – 2023", what: "BSc Computer Science", where: "Srimad Andavan Arts & Science College, Trichy" },
     { when: "2024", what: "Frontend Developer Course", where: "Besant Technologies, Chennai" },
-    { when: "Aug 2024 →", what: "Full Stack Developer", where: "Opalminds IT Solutions, Trichy", current: true },
+    { when: "Oct 2024 →", what: "Full Stack Developer", where: "Opalminds IT Solutions, Trichy", current: true },
     { when: "2026", what: "Independent builds", where: "Mero, ClipDub, m-vpn, mt5-mcp, Pulse and more" },
   ],
 };

@@ -267,6 +267,33 @@
     }, 2800);
   }
 
+  // One-tap dark / light switch with a circular reveal where supported
+  function themeToggle() {
+    const btn = $("[data-theme-toggle]");
+    const meta = $('meta[name="theme-color"]');
+    const label = (t) => {
+      btn.setAttribute("aria-label", t === "dark" ? "Switch to light mode" : "Switch to dark mode");
+      if (meta) meta.setAttribute("content", t === "dark" ? "#050507" : "#f5f4f0");
+    };
+    const apply = (t) => {
+      root.setAttribute("data-theme", t);
+      try { localStorage.setItem("theme", t); } catch (e) { /* storage blocked */ }
+      label(t);
+    };
+    label(root.getAttribute("data-theme") || "dark");
+    btn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      if (!document.startViewTransition || reduced) { apply(next); return; }
+      const r = btn.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const rad = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      document.startViewTransition(() => apply(next)).ready.then(() => {
+        root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${rad}px at ${x}px ${y}px)`] },
+          { duration: 900, easing: "cubic-bezier(.65,0,.35,1)", pseudoElement: "::view-transition-new(root)" });
+      }).catch(() => {});
+    });
+  }
+
   /* ---------------- Hero particles ---------------- */
   function particles() {
     const canvas = $(".hero__canvas");
@@ -374,6 +401,7 @@
   renderJourney();
   renderSkillTabs();
   clock();
+  themeToggle();
   $$(".btn > span, .nav__cta > span").forEach(roll);
   $$(".nav__links a").forEach(roll);
   $$(".section-label").forEach((l) => {
@@ -439,23 +467,24 @@
       .to(c, { yPercent: 0, rotationX: 0, duration: 0.9, ease: "elastic.out(1, 0.35)" });
   }));
 
-  gsap.timeline({
+  // Loader: greetings in several languages, then the panel lifts away with a curved edge
+  const hello = $("[data-hello]");
+  const greetings = ["Hello", "नमस्ते", "Hola", "Bonjour", "Ciao", "こんにちは", "Olá", "வணக்கம்"];
+  const step = 0.19, helloEnd = 0.6 + (greetings.length - 1) * step;
+  const lt = gsap.timeline({
     onComplete() {
       loaderEl.remove();
       lenis && lenis.start();
       ScrollTrigger.refresh();
     },
-  })
-    .to(".loader__name span", { y: 0, duration: 0.9, stagger: 0.06, ease: "expo.out" })
-    .to(".loader__bar i", { scaleX: 1, duration: 1.5, ease: "power2.inOut" }, 0.2)
-    .to(count, { v: 100, duration: 1.5, ease: "power2.inOut", onUpdate() { $(".loader__count b").textContent = Math.round(count.v); } }, 0.2)
-    .to(".loader__name span", { y: "-110%", duration: 0.6, stagger: 0.04, ease: "expo.in" }, "+=0.1")
-    .to(".loader__curtain", { scaleY: 1, duration: 0.6, ease: "expo.inOut" }, "-=0.35")
-    .set(".loader__inner", { opacity: 0 })
-    .set(".loader__curtain", { transformOrigin: "top" })
-    .to(".loader__curtain", { scaleY: 0, duration: 0.8, ease: "expo.inOut" })
-    .add(() => intro.play(), "-=0.5")
-    .to(loaderEl, { autoAlpha: 0, duration: 0.01 });
+  });
+  lt.to(".loader__hello", { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 0);
+  greetings.slice(1).forEach((g, i) => lt.add(() => { hello.textContent = g; }, 0.6 + i * step));
+  lt.to(count, { v: 100, duration: helloEnd, ease: "power2.inOut", onUpdate() { $(".loader__count b").textContent = Math.round(count.v); } }, 0)
+    .to(".loader__hello, .loader__count", { opacity: 0, y: -40, duration: 0.45, ease: "power2.in" }, helloEnd + 0.3)
+    .to(loaderEl, { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "-=0.1")
+    .to(".loader__curve path", { attr: { d: "M0 0 L1000 0 Q500 0 0 0 Z" }, duration: 1.1, ease: "expo.inOut" }, "<")
+    .add(() => intro.play(), "<0.45");
 
   particles();
   cursor();
@@ -479,12 +508,26 @@
     } });
 
   /* Hero exit parallax */
-  gsap.to(".hero__name", { yPercent: -35, scale: 0.92, opacity: 0.2, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  gsap.to(".hero__name", { yPercent: -20, opacity: 0.15, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  // Letters drift apart at different speeds as the hero scrolls away
+  gsap.to(nameChars, { y: (i) => -(50 + ((i * 37) % 5) * 45), rotation: (i) => (i - (nameChars.length - 1) / 2) * 7, ease: "none",
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.6 } });
+  gsap.to(".hero__canvas", { opacity: 0, scale: 1.15, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.fromTo(".hero__content .hero__row, .hero__ctas", { y: 0, opacity: 1 }, { y: -80, opacity: 0, ease: "none", immediateRender: false, scrollTrigger: { trigger: ".hero", start: "30% top", end: "bottom top", scrub: true } });
 
   /* Section titles: word reveals */
+  // Each section title has its own entrance
+  const REVEALS = {
+    rise: { from: { yPercent: 110, rotate: 4 }, stagger: 0.06 },
+    blur: { from: { yPercent: 35, opacity: 0, filter: "blur(14px)" }, stagger: 0.09 },
+    flip: { from: { rotationX: -95, yPercent: 40, opacity: 0, transformOrigin: "50% 100%" }, stagger: 0.08 },
+    pop: { from: { scale: 0.2, opacity: 0, yPercent: 60 }, stagger: { each: 0.07, from: "random" }, ease: "back.out(1.8)" },
+    slide: { from: { xPercent: 110, skewX: -18 }, stagger: 0.07 },
+  };
   wordGroups.forEach(({ el, words }) => {
-    gsap.from(words, { yPercent: 110, rotate: 4, duration: 1.1, ease: "expo.out", stagger: 0.06, scrollTrigger: { trigger: el, start: "top 88%" } });
+    const host = el.closest("[data-reveal]");
+    const r = REVEALS[(host && host.dataset.reveal) || "rise"] || REVEALS.rise;
+    gsap.from(words, { ...r.from, duration: 1.2, ease: r.ease || "expo.out", stagger: r.stagger, scrollTrigger: { trigger: el, start: "top 88%" } });
   });
   $$(".sport-title").forEach((el) => {
     gsap.from($$(".word", el), { yPercent: 110, duration: 1.2, ease: "expo.out", stagger: 0.1, scrollTrigger: { trigger: el, start: "top 85%" } });
@@ -501,10 +544,30 @@
   gsap.from(".stats > div", { y: 40, opacity: 0, duration: 1, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: ".stats", start: "top 88%" } });
 
   /* About: scroll-scrubbed words + photo parallax */
-  gsap.to(".scrub-text .w", { color: "#f4f4f6", stagger: 0.1, ease: "none", scrollTrigger: { trigger: ".scrub-text", start: "top 80%", end: "bottom 45%", scrub: true } });
+  gsap.to(".scrub-text .w", { opacity: 1, stagger: 0.1, ease: "none", scrollTrigger: { trigger: ".scrub-text", start: "top 80%", end: "bottom 45%", scrub: true } });
   gsap.fromTo(".about__frame", { clipPath: "inset(18% 12% 18% 12% round 20px)" }, { clipPath: "inset(0% 0% 0% 0% round 20px)", ease: "none", scrollTrigger: { trigger: ".about", start: "top 85%", end: "top 25%", scrub: true } });
   gsap.fromTo(".about__frame img", { yPercent: -12, scale: 1.15 }, { yPercent: 0, scale: 1, ease: "none", scrollTrigger: { trigger: ".about", start: "top bottom", end: "bottom top", scrub: true } });
   gsap.from(".about__facts > div, .about__philosophy li", { opacity: 0, y: 30, duration: 0.9, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".about__facts", start: "top 85%" } });
+
+  // About: photo straightens and grows into place
+  gsap.fromTo(".about__photo", { rotate: -6, scale: 0.9 }, { rotate: 0, scale: 1, ease: "none", scrollTrigger: { trigger: ".about", start: "top bottom", end: "top 15%", scrub: true } });
+
+  // Skills: the section opens out from a rounded card to full width
+  gsap.fromTo(".skills", { clipPath: "inset(7% 5% 7% 5% round 48px)" }, { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none",
+    scrollTrigger: { trigger: ".skills", start: "top bottom", end: "top 15%", scrub: true } });
+
+  // Work: the two halves of the title pull apart as you scroll
+  const workParts = $$("#work .big-title .split-words");
+  if (workParts.length === 2) {
+    gsap.fromTo(workParts[0], { x: 0 }, { x: () => -window.innerWidth * 0.05, ease: "none", scrollTrigger: { trigger: ".work__intro", start: "top 70%", end: "bottom top", scrub: true } });
+    gsap.fromTo(workParts[1], { x: 0 }, { x: () => window.innerWidth * 0.08, ease: "none", scrollTrigger: { trigger: ".work__intro", start: "top 70%", end: "bottom top", scrub: true } });
+  }
+
+  // Play: zoom into the floodlit pitch, then wipe across to the cricket ground
+  gsap.fromTo(".pitch", { clipPath: "circle(16% at 50% 50%)" }, { clipPath: "circle(75% at 50% 50%)", ease: "none",
+    scrollTrigger: { trigger: ".pitch", start: "top bottom", end: "top top", scrub: true } });
+  gsap.fromTo(".crease", { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }, { clipPath: "polygon(-30% 0%, 100% 0%, 100% 100%, 0% 100%)", ease: "none",
+    scrollTrigger: { trigger: ".crease", start: "top bottom", end: "top 20%", scrub: true } });
 
   /* Skills */
   ScrollTrigger.create({ trigger: ".skills__stage", start: "top 75%", once: true, onEnter: () => showSkills(0, true) });
@@ -551,9 +614,9 @@
   gsap.to(".timeline__line i", { scaleY: 1, ease: "none", scrollTrigger: { trigger: ".timeline", start: "top 70%", end: "bottom 60%", scrub: true } });
   $$(".tl").forEach((li) => {
     ScrollTrigger.create({ trigger: li, start: "top 70%", onEnter: () => li.classList.add("is-on"), onLeaveBack: () => li.classList.remove("is-on") });
-    gsap.from(li.children, { x: 40, opacity: 0, duration: 1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: li, start: "top 82%" } });
+    gsap.from(li, { rotationX: -75, y: 30, opacity: 0, transformOrigin: "0% 0%", transformPerspective: 800, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: li, start: "top 85%" } });
   });
-  gsap.from(".job", { y: 60, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: ".job", start: "top 85%" } });
+  gsap.fromTo(".job", { clipPath: "inset(100% 0% 0% 0% round 24px)" }, { clipPath: "inset(0% 0% 0% 0% round 24px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: ".job", start: "top 85%" } });
   gsap.from(".job li", { x: 30, opacity: 0, duration: 0.8, stagger: 0.07, ease: "expo.out", scrollTrigger: { trigger: ".job ul", start: "top 85%" } });
 
   /* Football: pitch lines draw, ball rolls across */
@@ -577,7 +640,8 @@
   gsap.from(".crease__copy p, .crease__copy .pitch__tag", { opacity: 0, y: 30, duration: 1, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: ".crease__copy", start: "top 80%" } });
 
   /* Contact */
-  gsap.from(".contact__lead, .contact__mail, .contact__links li", { opacity: 0, y: 40, duration: 1.1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".contact__lead", start: "top 88%" } });
+  gsap.from(".contact__mail", { scale: 0.5, opacity: 0, duration: 1.6, ease: "elastic.out(1, 0.5)", scrollTrigger: { trigger: ".contact__mail", start: "top 90%" } });
+  gsap.from(".contact__lead, .contact__links li", { opacity: 0, y: 40, duration: 1.1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".contact__lead", start: "top 88%" } });
 
   /* Giant footer name rises letter by letter */
   gsap.fromTo(giantChars, { yPercent: 100 }, { yPercent: 0, stagger: 0.08, ease: "power2.out",

@@ -10,7 +10,7 @@
 <meta property="og:title" content="Saran — Full-Stack Engineer">
 <meta property="og:description" content="AI agentic systems and production web platforms. Java · Spring Boot · Angular · TypeScript · Python · PostgreSQL.">
 <meta property="og:image" content="assets/saran.webp">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050507'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='900' font-size='38' fill='%233b82f6'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050507'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='900' font-size='38' fill='%233b82f6'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,11 +18,11 @@
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=3">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Saran","jobTitle":"Full-Stack Engineer","address":{"@type":"PostalAddress","addressLocality":"Trichy","addressRegion":"Tamil Nadu","addressCountry":"IN"},"email":"mailto:saranvelmanik@gmail.com","sameAs":["https://github.com/SaranVelmani","https://linkedin.com/in/saranvelmani"],"knowsAbout":["Java","Spring Boot","Angular","TypeScript","Python","PostgreSQL","Supabase","Docker","AWS","LangGraph"]}
 </script>
-<script>document.documentElement.classList.add('js');</script>
+<script>(function(){var d=document.documentElement,t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';d.setAttribute('data-theme',t);d.classList.add('js');})();</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -31,12 +31,9 @@
 
 <!-- Loader -->
 <div class="loader" aria-hidden="true">
-  <div class="loader__inner">
-    <div class="loader__name"><span>S</span><span>A</span><span>R</span><span>A</span><span>N</span></div>
-    <div class="loader__bar"><i></i></div>
-    <div class="loader__count"><b>0</b>%</div>
-  </div>
-  <div class="loader__curtain"></div>
+  <p class="loader__hello"><i></i><span data-hello>Hello</span></p>
+  <div class="loader__count"><b>0</b></div>
+  <svg class="loader__curve" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0 0 L1000 0 Q500 100 0 0 Z"/></svg>
 </div>
 
 <!-- Cursor -->
@@ -44,12 +41,17 @@
 
 <!-- Nav -->
 <header class="nav">
-  <a class="nav__logo magnetic" href="#top" aria-label="Back to top">S<span>.</span></a>
+  <a class="nav__logo magnetic" href="#top" aria-label="Back to top">MERO<span>.</span></a>
   <nav class="nav__links" aria-label="Sections">
     <a href="#about">About</a><a href="#skills">Stack</a><a href="#work">Work</a><a href="#journey">Journey</a><a href="#play">Play</a>
   </nav>
-  <a class="nav__cta magnetic" href="#contact"><span>Let's talk</span></a>
-  <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><i></i><i></i></button>
+  <div class="nav__right">
+    <a class="nav__cta magnetic" href="#contact"><span>Let's talk</span></a>
+    <button class="theme-toggle magnetic" type="button" aria-label="Switch colour theme" data-theme-toggle>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g><path class="moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><i></i><i></i></button>
+  </div>
 </header>
 <div class="menu" id="menu" aria-hidden="true">
   <nav aria-label="Mobile">
@@ -133,7 +135,7 @@
   <!-- SKILLS -->
   <section class="skills" id="skills">
     <div class="section-label"><span>02</span> Stack</div>
-    <h2 class="big-title"><span class="split-words">Tools I reach for,</span> <span class="split-words muted serif">across the whole stack.</span></h2>
+    <h2 class="big-title" data-reveal="rise"><span class="split-words">Tools I reach for,</span> <span class="split-words muted serif">across the whole stack.</span></h2>
     <div class="skills__wrap">
       <div class="skills__tabs" role="tablist" aria-label="Skill categories" data-skill-tabs></div>
       <div class="skills__stage" data-skill-stage>
@@ -148,7 +150,7 @@
   <section class="work" id="work">
     <div class="work__intro">
       <div class="section-label"><span>03</span> Selected work</div>
-      <h2 class="big-title"><span class="split-words">Things I've built</span> <span class="split-words muted serif">on my own time.</span></h2>
+      <h2 class="big-title" data-reveal="blur"><span class="split-words">Things I've built</span> <span class="split-words muted serif">on my own time.</span></h2>
       <p class="work__hint">Scroll to explore <span aria-hidden="true">→</span></p>
     </div>
     <div class="work__pin">
@@ -160,7 +162,7 @@
   <!-- JOURNEY -->
   <section class="journey" id="journey">
     <div class="section-label"><span>04</span> Journey</div>
-    <h2 class="big-title"><span class="split-words">From classroom</span> <span class="split-words muted serif">to production.</span></h2>
+    <h2 class="big-title" data-reveal="flip"><span class="split-words">From classroom</span> <span class="split-words muted serif">to production.</span></h2>
     <div class="journey__grid">
       <ol class="timeline" data-timeline>
         <li class="timeline__line" aria-hidden="true"><i></i></li>
@@ -173,7 +175,7 @@
   <section class="play" id="play">
     <div class="play__head">
       <div class="section-label"><span>05</span> Beyond the code</div>
-      <h2 class="big-title"><span class="split-words">Same instincts,</span> <span class="split-words muted serif">different field.</span></h2>
+      <h2 class="big-title" data-reveal="pop"><span class="split-words">Same instincts,</span> <span class="split-words muted serif">different field.</span></h2>
     </div>
 
     <div class="pitch" data-pitch>
@@ -219,7 +221,7 @@
   <!-- CONTACT -->
   <section class="contact" id="contact">
     <div class="section-label"><span>06</span> Contact</div>
-    <h2 class="contact__title"><span class="split-words">Let's build</span> <span class="split-words accent serif">something real.</span></h2>
+    <h2 class="contact__title" data-reveal="slide"><span class="split-words">Let's build</span> <span class="split-words accent serif">something real.</span></h2>
     <p class="contact__lead">Freelance project, full-time role, or just an idea you want to talk through. My inbox is open.</p>
     <a class="contact__mail magnetic" data-mail href="mailto:saranvelmanik@gmail.com"><span>saranvelmanik@gmail.com</span><i aria-hidden="true">↗</i></a>
     <ul class="contact__links">
@@ -239,7 +241,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
-<script src="js/data.js" defer></script>
-<script src="js/main.js" defer></script>
+<script src="js/data.js?v=3" defer></script>
+<script src="js/main.js?v=3" defer></script>
 </body>
 </html>
