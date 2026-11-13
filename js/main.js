@@ -14,9 +14,11 @@
 
   /* ---------------- Render content ---------------- */
   function renderMarquee() {
-    const t = $("[data-marquee]");
-    const items = D.marquee.map((m) => `<span>${esc(m)}</span>`).join("");
-    t.innerHTML = items + items; // doubled for a seamless loop
+    $$("[data-marquee]").forEach((t) => {
+      const list = t.dataset.marquee === "rev" ? D.marquee.slice().reverse() : D.marquee;
+      const items = list.map((m) => `<span>${esc(m)}</span>`).join("");
+      t.innerHTML = items + items; // doubled for a seamless loop
+    });
   }
 
   function visualFor(p) {
@@ -207,6 +209,64 @@
     return $$(".word", el);
   }
 
+  // Hover text roll: duplicate the label so it can slide up on hover
+  function roll(el) {
+    const t = el.textContent.trim();
+    el.innerHTML = `<span class="roll"><span>${esc(t)}</span><span aria-hidden="true">${esc(t)}</span></span>`;
+  }
+
+  // Random-character decode effect
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+/<>";
+  function scramble(el, duration = 0.9) {
+    const final = el.dataset.text || el.textContent;
+    const o = { p: 0 };
+    gsap.to(o, { p: 1, duration, ease: "none",
+      onUpdate() {
+        const n = Math.floor(o.p * final.length);
+        el.textContent = final.slice(0, n) + final.slice(n).replace(/\S/g, () => GLYPHS[(Math.random() * GLYPHS.length) | 0]);
+      },
+      onComplete() { el.textContent = final; } });
+  }
+
+  // Cursor-following light inside an element
+  function spotlight(el) {
+    if (!finePointer || !el) return;
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", e.clientX - r.left + "px");
+      el.style.setProperty("--my", e.clientY - r.top + "px");
+    });
+  }
+
+  // Skew targets by scroll velocity, easing back to 0
+  function velocitySkew(targets, max = 6, divisor = 300) {
+    const set = gsap.quickSetter(targets, "skewX", "deg");
+    const clamp = gsap.utils.clamp(-max, max);
+    const proxy = { s: 0 };
+    return (self) => {
+      const s = clamp(self.getVelocity() / -divisor);
+      if (Math.abs(s) > Math.abs(proxy.s)) {
+        proxy.s = s;
+        gsap.to(proxy, { s: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => set(proxy.s) });
+      }
+    };
+  }
+
+  // Rotating word in the hero role line
+  function rotator() {
+    const b = $("[data-rotator] b");
+    const words = ["AI agentic systems", "LLM pipelines", "Spring Boot services", "Angular platforms", "apps that ship"];
+    let i = 0;
+    setInterval(() => {
+      if (document.hidden) return;
+      i = (i + 1) % words.length;
+      gsap.timeline()
+        .to(b, { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in" })
+        .add(() => { b.textContent = words[i]; })
+        .fromTo(b, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.8, ease: "expo.out" });
+    }, 2800);
+  }
+
   /* ---------------- Hero particles ---------------- */
   function particles() {
     const canvas = $(".hero__canvas");
@@ -314,6 +374,16 @@
   renderJourney();
   renderSkillTabs();
   clock();
+  $$(".btn > span, .nav__cta > span").forEach(roll);
+  $$(".nav__links a").forEach(roll);
+  $$(".section-label").forEach((l) => {
+    const tn = Array.from(l.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!tn) return;
+    const em = document.createElement("em");
+    em.className = "sl";
+    em.textContent = em.dataset.text = tn.textContent.trim();
+    tn.replaceWith(em);
+  });
 
   // Scrub-text words (static colour when not animating)
   const scrub = $(".scrub-text");
@@ -343,6 +413,10 @@
   menu((t) => (lenis ? lenis.scrollTo(t, { offset: 0, duration: 1.4 }) : t.scrollIntoView({ behavior: "smooth" })));
 
   const nameChars = splitChars($("[data-split]"));
+  gsap.set(nameChars, { y: 0, yPercent: 115, rotationX: -85, opacity: 0 });
+  const giantChars = splitChars($("[data-giant]"));
+  const statEls = $$("[data-count]");
+  statEls.forEach((el) => { el.textContent = "0" + (el.dataset.suffix || ""); });
   const wordGroups = $$(".split-words").map((el) => ({ el, words: splitWords(el) }));
   $$(".sport-title").forEach((el) => {
     el.innerHTML = el.innerHTML.split("<br>").map((line) => `<span class="word-wrap"><span class="word">${line}</span></span>`).join("<br>");
@@ -352,10 +426,18 @@
   const loaderEl = $(".loader");
   const count = { v: 0 };
   const intro = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } })
-    .to(nameChars, { y: 0, duration: 1.4, stagger: 0.06 })
+    .to(nameChars, { yPercent: 0, rotationX: 0, opacity: 1, duration: 1.6, stagger: 0.07 })
     .to(".hero__eyebrow", { opacity: 1, duration: 1 }, 0.3)
     .to(".reveal-line", { clipPath: "inset(0 0 0% 0)", y: 0, duration: 1.2, stagger: 0.12 }, 0.4)
-    .to(".hero__row .reveal-up, .hero__ctas", { opacity: 1, y: 0, duration: 1.2, stagger: 0.1 }, 0.6);
+    .to(".hero__row .reveal-up, .hero__ctas", { opacity: 1, y: 0, duration: 1.2, stagger: 0.1 }, 0.6)
+    .add(() => { heroReady = true; rotator(); });
+  let heroReady = false;
+  nameChars.forEach((c) => c.addEventListener("pointerenter", () => {
+    if (!heroReady || gsap.isTweening(c)) return;
+    gsap.timeline()
+      .to(c, { yPercent: -12, rotationX: 25, duration: 0.3, ease: "power2.out" })
+      .to(c, { yPercent: 0, rotationX: 0, duration: 0.9, ease: "elastic.out(1, 0.35)" });
+  }));
 
   gsap.timeline({
     onComplete() {
@@ -377,6 +459,24 @@
 
   particles();
   cursor();
+  spotlight($(".hero"));
+  if (finePointer) { tilt($(".job"), 4); tilt($(".about__frame"), 6); }
+
+  /* Page progress bar */
+  gsap.to(".progress i", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 0.3 } });
+
+  /* Marquee: two rows in opposite directions, speeding up and skewing with scroll */
+  const loops = $$(".marquee__track").map((t, i) => i === 0
+    ? gsap.to(t, { xPercent: -50, repeat: -1, duration: 45, ease: "none" })
+    : gsap.fromTo(t, { xPercent: -50 }, { xPercent: 0, repeat: -1, duration: 45, ease: "none" }));
+  const marqueeSkew = velocitySkew($$(".marquee__track span"), 10, 200);
+  ScrollTrigger.create({ trigger: ".marquee", start: "top bottom", end: "bottom top",
+    onUpdate(self) {
+      marqueeSkew(self);
+      const boost = 1 + Math.min(Math.abs(self.getVelocity()) / 180, 6);
+      loops.forEach((l) => gsap.to(l, { timeScale: boost, duration: 0.15, overwrite: true,
+        onComplete: () => gsap.to(l, { timeScale: 1, duration: 1.2, ease: "power2.out" }) }));
+    } });
 
   /* Hero exit parallax */
   gsap.to(".hero__name", { yPercent: -35, scale: 0.92, opacity: 0.2, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
@@ -389,7 +489,16 @@
   $$(".sport-title").forEach((el) => {
     gsap.from($$(".word", el), { yPercent: 110, duration: 1.2, ease: "expo.out", stagger: 0.1, scrollTrigger: { trigger: el, start: "top 85%" } });
   });
-  $$(".section-label").forEach((el) => gsap.from(el, { opacity: 0, x: -30, duration: 1, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%" } }));
+  $$(".section-label").forEach((el) => gsap.from(el, { opacity: 0, x: -30, duration: 1, ease: "expo.out",
+    scrollTrigger: { trigger: el, start: "top 90%", once: true, onEnter: () => { const t = $(".sl", el); if (t) scramble(t); } } }));
+
+  /* Stats count up */
+  statEls.forEach((el) => {
+    const o = { v: 0 }, n = +el.dataset.count, suf = el.dataset.suffix || "";
+    ScrollTrigger.create({ trigger: el, start: "top 88%", once: true,
+      onEnter: () => gsap.to(o, { v: n, duration: 2, ease: "power3.out", onUpdate: () => { el.textContent = Math.round(o.v) + suf; } }) });
+  });
+  gsap.from(".stats > div", { y: 40, opacity: 0, duration: 1, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: ".stats", start: "top 88%" } });
 
   /* About: scroll-scrubbed words + photo parallax */
   gsap.to(".scrub-text .w", { color: "#f4f4f6", stagger: 0.1, ease: "none", scrollTrigger: { trigger: ".scrub-text", start: "top 80%", end: "bottom 45%", scrub: true } });
@@ -417,8 +526,10 @@
   mm.add("(min-width: 961px)", () => {
     const track = $(".work__track");
     const dist = () => track.scrollWidth - window.innerWidth;
+    const cardSkew = velocitySkew($$(".project"), 5, 400);
     const tween = gsap.to(track, { x: () => -dist(), ease: "none", scrollTrigger: {
       trigger: ".work__pin", start: "top top", end: () => "+=" + dist(), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1,
+      onUpdate: cardSkew,
     } });
     gsap.to(".work__progress i", { scaleX: 1, ease: "none", scrollTrigger: { trigger: ".work__pin", start: "top top", end: () => "+=" + dist(), scrub: true } });
     $$(".project").forEach((card) => {
@@ -429,6 +540,7 @@
         scrollTrigger: { trigger: card, containerAnimation: tween, start: "left 75%" },
       });
       tilt(card, 3);
+      spotlight(card);
     });
   });
   mm.add("(max-width: 960px)", () => {
@@ -466,6 +578,10 @@
 
   /* Contact */
   gsap.from(".contact__lead, .contact__mail, .contact__links li", { opacity: 0, y: 40, duration: 1.1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".contact__lead", start: "top 88%" } });
+
+  /* Giant footer name rises letter by letter */
+  gsap.fromTo(giantChars, { yPercent: 100 }, { yPercent: 0, stagger: 0.08, ease: "power2.out",
+    scrollTrigger: { trigger: ".giant", start: "top bottom", end: "bottom bottom", scrub: 1 } });
 
   /* Nav hides on scroll down, returns on scroll up */
   const nav = $(".nav");

@@ -11,9 +11,13 @@
 <meta property="og:description" content="AI agentic systems and production web platforms. Java · Spring Boot · Angular · TypeScript · Python · PostgreSQL.">
 <meta property="og:image" content="assets/saran.webp">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050507'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='900' font-size='38' fill='%233b82f6'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Saran","jobTitle":"Full-Stack Engineer","address":{"@type":"PostalAddress","addressLocality":"Trichy","addressRegion":"Tamil Nadu","addressCountry":"IN"},"email":"mailto:saranvelmanik@gmail.com","sameAs":["https://github.com/SaranVelmani","https://linkedin.com/in/saranvelmani"],"knowsAbout":["Java","Spring Boot","Angular","TypeScript","Python","PostgreSQL","Supabase","Docker","AWS","LangGraph"]}
@@ -22,6 +26,8 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><i></i></div>
+<div class="grain" aria-hidden="true"></div>
 
 <!-- Loader -->
 <div class="loader" aria-hidden="true">
@@ -61,6 +67,7 @@
   <section class="hero" id="top">
     <canvas class="hero__canvas" aria-hidden="true"></canvas>
     <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__spot" aria-hidden="true"></div>
     <div class="hero__grid" aria-hidden="true"></div>
     <div class="hero__content">
       <p class="hero__eyebrow"><span class="dot"></span> Available for freelance &amp; collaborations</p>
@@ -68,7 +75,7 @@
         <span class="split" data-split>SARAN</span>
       </h1>
       <div class="hero__row">
-        <p class="hero__role"><span class="reveal-line">Full-Stack Engineer</span><span class="reveal-line accent">building AI agentic systems</span></p>
+        <p class="hero__role"><span class="reveal-line">Full-Stack Engineer</span><span class="reveal-line">building <span class="rotator" data-rotator><b>AI agentic systems</b></span></span></p>
         <p class="hero__intro reveal-up">I build production web platforms and LLM-powered pipelines with Java, Spring Boot, Angular, TypeScript and Python, from database migration to deployed container.</p>
       </div>
       <div class="hero__ctas reveal-up">
@@ -85,7 +92,10 @@
   </section>
 
   <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true"><div class="marquee__track" data-marquee></div></div>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" data-marquee></div>
+    <div class="marquee__track marquee__track--outline" data-marquee="rev"></div>
+  </div>
 
   <!-- ABOUT -->
   <section class="about" id="about">
@@ -97,9 +107,14 @@
       </div>
       <div class="about__text">
         <p class="scrub-text">I'm Saran, a full-stack engineer from Trichy. By day I build AI-powered platforms: multi-agent LLM pipelines, retrieval systems, and the Spring Boot and Angular services around them. By night I keep building: a VPN service, an AI video dubber, a chat-first expense tracker.</p>
+        <div class="stats">
+          <div><b data-count="8">8</b><small>Projects built on my own time</small></div>
+          <div><b data-count="144">144</b><small>Automated tests in a single app</small></div>
+          <div><b data-count="2" data-suffix="+">2+</b><small>Years shipping to production</small></div>
+        </div>
         <div class="about__facts">
           <div><small>Based in</small><b>Trichy, Tamil Nadu</b></div>
-          <div><small>Experience</small><b>2+ years</b></div>
+          <div><small>Core stack</small><b>Java · TypeScript · Python</b></div>
           <div><small>Focus</small><b>Full-stack + AI agents</b></div>
           <div><small>Also a</small><b>Tester at heart</b></div>
         </div>
@@ -118,7 +133,7 @@
   <!-- SKILLS -->
   <section class="skills" id="skills">
     <div class="section-label"><span>02</span> Stack</div>
-    <h2 class="big-title"><span class="split-words">Tools I reach for,</span> <span class="split-words muted">across the whole stack.</span></h2>
+    <h2 class="big-title"><span class="split-words">Tools I reach for,</span> <span class="split-words muted serif">across the whole stack.</span></h2>
     <div class="skills__wrap">
       <div class="skills__tabs" role="tablist" aria-label="Skill categories" data-skill-tabs></div>
       <div class="skills__stage" data-skill-stage>
@@ -133,7 +148,7 @@
   <section class="work" id="work">
     <div class="work__intro">
       <div class="section-label"><span>03</span> Selected work</div>
-      <h2 class="big-title"><span class="split-words">Things I've built</span> <span class="split-words muted">on my own time.</span></h2>
+      <h2 class="big-title"><span class="split-words">Things I've built</span> <span class="split-words muted serif">on my own time.</span></h2>
       <p class="work__hint">Scroll to explore <span aria-hidden="true">→</span></p>
     </div>
     <div class="work__pin">
@@ -145,7 +160,7 @@
   <!-- JOURNEY -->
   <section class="journey" id="journey">
     <div class="section-label"><span>04</span> Journey</div>
-    <h2 class="big-title"><span class="split-words">From classroom</span> <span class="split-words muted">to production.</span></h2>
+    <h2 class="big-title"><span class="split-words">From classroom</span> <span class="split-words muted serif">to production.</span></h2>
     <div class="journey__grid">
       <ol class="timeline" data-timeline>
         <li class="timeline__line" aria-hidden="true"><i></i></li>
@@ -158,7 +173,7 @@
   <section class="play" id="play">
     <div class="play__head">
       <div class="section-label"><span>05</span> Beyond the code</div>
-      <h2 class="big-title"><span class="split-words">Same instincts,</span> <span class="split-words muted">different field.</span></h2>
+      <h2 class="big-title"><span class="split-words">Same instincts,</span> <span class="split-words muted serif">different field.</span></h2>
     </div>
 
     <div class="pitch" data-pitch>
@@ -204,7 +219,7 @@
   <!-- CONTACT -->
   <section class="contact" id="contact">
     <div class="section-label"><span>06</span> Contact</div>
-    <h2 class="contact__title"><span class="split-words">Let's build</span> <span class="split-words accent">something real.</span></h2>
+    <h2 class="contact__title"><span class="split-words">Let's build</span> <span class="split-words accent serif">something real.</span></h2>
     <p class="contact__lead">Freelance project, full-time role, or just an idea you want to talk through. My inbox is open.</p>
     <a class="contact__mail magnetic" data-mail href="mailto:saranvelmanik@gmail.com"><span>saranvelmanik@gmail.com</span><i aria-hidden="true">↗</i></a>
     <ul class="contact__links">
@@ -217,6 +232,7 @@
       <span>Built by hand with GSAP, ScrollTrigger &amp; Lenis</span>
       <a href="#top" class="magnetic">Back to top ↑</a>
     </footer>
+    <div class="giant" aria-hidden="true"><span data-giant>SARAN</span></div>
   </section>
 </main>
 
